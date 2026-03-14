@@ -21,6 +21,8 @@ export interface LevelDef {
   id: string;
   charId: string;
   charName: string;
+  avatar: string;
+  cardImg: string;
   baseImg: string;
   diffImg: string;
   differences: DiffRegion[];

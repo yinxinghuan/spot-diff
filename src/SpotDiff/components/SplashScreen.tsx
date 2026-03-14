@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { LEVELS } from '../levels';
+import posterImg from '../img/poster.png';
 
 const ALL_IMAGES: string[] = LEVELS.flatMap(l => [l.baseImg, l.diffImg]);
-const MIN_MS = 1800;
+const MIN_MS = 2200;
 const MAX_ASSET_MS = 10000;
 
 interface SplashScreenProps {
@@ -10,6 +11,7 @@ interface SplashScreenProps {
 }
 
 const SplashScreen: React.FC<SplashScreenProps> = ({ onDone }) => {
+  const [posterReady, setPosterReady] = useState(false);
   const [progress, setProgress] = useState(0);
   const [fading, setFading] = useState(false);
   const [minDone, setMinDone] = useState(false);
@@ -34,7 +36,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onDone }) => {
       const img = new Image();
       img.onload = img.onerror = () => {
         loaded += 1;
-        setProgress(loaded / total);
+        setProgress(Math.round((loaded / total) * 100));
         if (loaded === total) {
           clearTimeout(timeout);
           setAssetsDone(true);
@@ -59,14 +61,17 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onDone }) => {
 
   return (
     <div className={`sd-splash${fading ? ' sd-splash--fading' : ''}`}>
-      <div className="sd-splash__content">
-        <div className="sd-splash__icon">🔍</div>
-        <h1 className="sd-splash__title">SPOT DIFF</h1>
-      </div>
+      <img
+        className={`sd-splash__img${posterReady ? ' sd-splash__img--visible' : ''}`}
+        src={posterImg}
+        alt="Spot the Difference"
+        draggable={false}
+        onLoad={() => setPosterReady(true)}
+      />
       <div className="sd-splash__bar-track">
         <div
           className="sd-splash__bar-fill"
-          style={{ width: `${Math.round(progress * 100)}%` }}
+          style={{ width: `${progress}%` }}
         />
       </div>
     </div>

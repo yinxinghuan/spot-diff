@@ -1,6 +1,9 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import type { GamePhase, LevelDef, LevelResult, SaveData } from '../types';
 import { LEVELS } from '../levels';
+import { getLocale } from '../i18n';
+import type { BubbleMood } from '../utils/expressions';
+import { resumeAudio, playTap, playFound, playWrong, playHint, playComplete, playStart } from '../utils/sounds';
 
 const STORAGE_KEY = 'sd_save';
 const POINTS_PER_FIND = 100;
@@ -52,11 +55,14 @@ export function useSpotDiff() {
   const [lastResult, setLastResult] = useState<LevelResult | null>(null);
   const [isNewRecord, setIsNewRecord] = useState(false);
   const [bubbleText, setBubbleText] = useState<string | null>(null);
+  const [bubbleMood, setBubbleMood] = useState<BubbleMood>('normal');
+  const [bubbleLeaving, setBubbleLeaving] = useState(false);
   const [cooldown, setCooldown] = useState(false);
   const [hintTarget, setHintTarget] = useState<string | null>(null);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const bubbleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const bubbleLeaveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Timer
   useEffect(() => {
@@ -68,10 +74,19 @@ export function useSpotDiff() {
     };
   }, [phase]);
 
-  const showBubble = useCallback((text: string, durationMs = 1500) => {
-    setBubbleText(text);
+  const showBubble = useCallback((text: string, durationMs = 1500, mood: BubbleMood = 'normal') => {
     if (bubbleTimerRef.current) clearTimeout(bubbleTimerRef.current);
-    bubbleTimerRef.current = setTimeout(() => setBubbleText(null), durationMs);
+    if (bubbleLeaveRef.current) clearTimeout(bubbleLeaveRef.current);
+    setBubbleLeaving(false);
+    setBubbleMood(mood);
+    setBubbleText(text);
+    bubbleTimerRef.current = setTimeout(() => {
+      setBubbleLeaving(true);
+      bubbleLeaveRef.current = setTimeout(() => {
+        setBubbleText(null);
+        setBubbleLeaving(false);
+      }, 300);
+    }, durationMs);
   }, []);
 
   const goToSelect = useCallback(() => {
@@ -98,8 +113,15 @@ export function useSpotDiff() {
     setIsNewRecord(false);
     setHintTarget(null);
     setBubbleText(null);
+    vagueHintShownRef.current = new Set();
     setPhase('playing');
-  }, []);
+    resumeAudio();
+    playStart();
+    // Show character start line after a short delay
+    setTimeout(() => {
+      showBubble(`bubble.start.${level.charId}`, 2000, 'normal');
+    }, 500);
+  }, [showBubble]);
 
   const completeLevel = useCallback((level: LevelDef, finalTime: number, finalErrors: number, finalHints: number) => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -131,6 +153,7 @@ export function useSpotDiff() {
 
   const handleTap = useCallback((nx: number, ny: number) => {
     if (phase !== 'playing' || !currentLevel || cooldown) return;
+    playTap();
 
     // Check hit
     for (const diff of currentLevel.differences) {
@@ -143,24 +166,32 @@ export function useSpotDiff() {
         newFound.add(diff.id);
         setFoundIds(newFound);
         setHintTarget(null);
-        showBubble('bubble.found');
+        playFound();
+        showBubble(`bubble.found.${currentLevel.charId}`, 1500, 'happy');
 
         // Check completion
         if (newFound.size === currentLevel.differences.length) {
-          showBubble('bubble.clear', 3000);
-          // Use current state values since they're captured in closure
-          completeLevel(currentLevel, time, errors, hintsUsed);
+          playComplete();
+          showBubble(`bubble.clear.${currentLevel.charId}`, 2500, 'happy');
+          // Delay to let player see the last marker + celebration message
+          setTimeout(() => {
+            completeLevel(currentLevel, time, errors, hintsUsed);
+          }, 2000);
         }
         return;
       }
     }
 
     // Miss
+    playWrong();
     setErrors(e => e + 1);
     setCooldown(true);
-    showBubble('bubble.wrong');
+    showBubble(`bubble.wrong.${currentLevel.charId}`, 1500, 'normal');
     setTimeout(() => setCooldown(false), COOLDOWN_MS);
   }, [phase, currentLevel, cooldown, foundIds, time, errors, hintsUsed, completeLevel, showBubble]);
+
+  // Track which diffs have had vague hints shown (next press = specific)
+  const vagueHintShownRef = useRef<Set<string>>(new Set());
 
   const useHint = useCallback(() => {
     if (phase !== 'playing' || !currentLevel || hintsUsed >= MAX_HINTS) return;
@@ -170,11 +201,28 @@ export function useSpotDiff() {
 
     const target = remaining[Math.floor(Math.random() * remaining.length)];
     setHintsUsed(h => h + 1);
-    setHintTarget(target.id);
-    showBubble('bubble.hint');
+    setHintTarget(null);
+    playHint();
 
-    // Clear hint highlight after 2s
-    setTimeout(() => setHintTarget(null), 2000);
+    const isZh = getLocale() === 'zh';
+    const label = isZh ? target.label_zh : target.label_en;
+
+    if (!vagueHintShownRef.current.has(target.id)) {
+      // First tier: vague hint — general area description
+      vagueHintShownRef.current.add(target.id);
+      const area = target.cy < 0.33 ? (isZh ? '上方' : 'upper area')
+        : target.cy > 0.66 ? (isZh ? '下方' : 'lower area')
+        : (isZh ? '中间' : 'middle area');
+      const side = target.cx < 0.33 ? (isZh ? '左侧' : 'left side')
+        : target.cx > 0.66 ? (isZh ? '右侧' : 'right side')
+        : (isZh ? '中央' : 'center');
+      const vagueMsg = isZh ? `试试看${area}${side}…` : `Try the ${area}, ${side}...`;
+      showBubble(vagueMsg, 2500);
+    } else {
+      // Second tier: specific hint — name the object
+      const specificMsg = isZh ? `注意看${label}！` : `Look at the ${label}!`;
+      showBubble(specificMsg, 2500);
+    }
   }, [phase, currentLevel, hintsUsed, foundIds, showBubble]);
 
   const nextLevel = useCallback(() => {
@@ -201,6 +249,8 @@ export function useSpotDiff() {
     lastResult,
     isNewRecord,
     bubbleText,
+    bubbleMood,
+    bubbleLeaving,
     cooldown,
     hintTarget,
     levels: LEVELS,

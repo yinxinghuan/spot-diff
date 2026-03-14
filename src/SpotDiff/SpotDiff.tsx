@@ -7,6 +7,7 @@ import ImagePair from './components/ImagePair';
 import CharBubble from './components/CharBubble';
 import HintButton from './components/HintButton';
 import aigramLogo from './img/aigram.svg';
+import { playClick, resumeAudio } from './utils/sounds';
 import './SpotDiff.less';
 
 const POINTS_PER_FIND = 100;
@@ -25,6 +26,8 @@ const SpotDiff: React.FC = () => {
     lastResult,
     isNewRecord,
     bubbleText,
+    bubbleMood,
+    bubbleLeaving,
     cooldown,
     hintTarget,
     levels,
@@ -47,17 +50,28 @@ const SpotDiff: React.FC = () => {
 
       {/* === IDLE / Title Screen === */}
       {phase === 'idle' && (
-        <div className="sd__overlay">
-          <div className="sd__modal">
-            <div className="sd__modal-icon">🔍</div>
-            <h1 className="sd__modal-title">{t('title')}</h1>
-            <p className="sd__modal-sub">{t('subtitle')}</p>
-            <div className="sd__modal-actions">
-              <button className="sd__btn sd__btn--start" onPointerDown={goToSelect}>
-                {t('startBtn')}
-              </button>
-            </div>
+        <div className="sd__title">
+          <div className="sd__title-top">
+            <div className="sd__title-magnifier">🔍</div>
+            <div className="sd__title-badge">CASE FILE</div>
           </div>
+          <div className="sd__title-center">
+            <div className="sd__title-line" />
+            <h1 className="sd__title-name">{t('title')}</h1>
+            <div className="sd__title-line" />
+            <p className="sd__title-sub">{t('subtitle')}</p>
+          </div>
+          <div className="sd__title-deco">
+            <span>6 {t('level').replace('{n}', '').trim()}</span>
+            <span>·</span>
+            <span>🔎 🕵️ 📋</span>
+          </div>
+          <div className="sd__title-bottom">
+            <button className="sd__btn sd__btn--start" onPointerDown={() => { resumeAudio(); playClick(); goToSelect(); }}>
+              {t('startBtn')}
+            </button>
+          </div>
+          <img className="sd__title-watermark" src={aigramLogo} alt="" draggable={false} />
         </div>
       )}
 
@@ -101,7 +115,6 @@ const SpotDiff: React.FC = () => {
 
           {/* Bottom bar */}
           <div className="sd__bottom">
-            <CharBubble charName={currentLevel.charName} textKey={bubbleText} />
             <div className="sd__bottom-actions">
               <HintButton hintsUsed={hintsUsed} maxHints={maxHints} onHint={useHint} />
               <button className="sd__btn sd__btn--quit" onPointerDown={goToSelect}>
@@ -109,6 +122,9 @@ const SpotDiff: React.FC = () => {
               </button>
             </div>
           </div>
+
+          {/* VN-style character dialogue overlay */}
+          <CharBubble charId={currentLevel.charId} charName={currentLevel.charName} textKey={bubbleText} mood={bubbleMood} leaving={bubbleLeaving} />
         </>
       )}
 
