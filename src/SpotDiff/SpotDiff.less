@@ -466,6 +466,38 @@
     text-shadow: 1px 1px 0 @gold-dark;
   }
 
+  // Clue evidence strip
+  &__clues {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  &__clue {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: @bg-dark;
+    border: 2px solid @border;
+    padding: 8px 10px;
+    min-width: 70px;
+  }
+
+  &__clue-emoji {
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  &__clue-label {
+    font-family: @pixel-font;
+    font-size: 7px;
+    color: @text-dim;
+    text-align: center;
+    line-height: 1.3;
+  }
+
   // Result table — case file
   &__result {
     background: @bg-dark;

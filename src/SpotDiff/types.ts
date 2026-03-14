@@ -15,6 +15,7 @@ export interface DiffRegion {
   r: number;
   label_zh: string;
   label_en: string;
+  emoji: string;
 }
 
 export interface LevelDef {
