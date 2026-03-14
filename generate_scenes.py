@@ -86,34 +86,37 @@ SCENES = [
     {
         "id": "ghostpixel",
         "prompt": (
-            "anime illustration of a spooky haunted cottage interior, "
-            "floating books and objects in mid-air, glowing candles with blue flames, "
-            "old wooden furniture, cobwebs, mysterious portal glow, "
-            "antique mirror on wall, ghostly mist, purple and blue lighting, "
-            "cracked window with moonlight, ornate rug on floor, "
-            "detailed anime background art style, no people, no characters"
+            "anime illustration of a spooky haunted mansion study room interior, "
+            "old wooden desk with glowing crystal ball, floating books and papers, "
+            "blue candles in silver candelabra, mysterious purple portal on wall, "
+            "dusty bookshelves with ancient tomes, raven perching on skull, "
+            "cobwebs in corners, cracked window with moonlight, ornate dark rug, "
+            "ghostly mist floating near floor, old globe on stand, "
+            "detailed anime background art style, gothic atmosphere, no people"
         ),
     },
     {
         "id": "isaya",
         "prompt": (
             "anime illustration of an artist bedroom studio interior, "
-            "easel with half-finished painting, art supplies and paint tubes scattered, "
-            "black cat sitting on windowsill, headphones on desk, "
-            "sketchbooks stacked, fairy lights on wall, cozy bed with plushies, "
-            "warm sunset light through window, paint palette, brush cups, "
-            "detailed anime background art style, no people, no characters"
+            "wooden easel with half-finished abstract painting, scattered art supplies, "
+            "black cat sitting on windowsill watching sunset, headphones on desk, "
+            "stacked sketchbooks, warm fairy lights on wall, cozy bed with plushies, "
+            "paint palette with bright colors, jar of paintbrushes, warm sunset light, "
+            "small potted plants on shelf, vinyl record player, coffee cup, "
+            "detailed anime background art style, warm cozy atmosphere, no people"
         ),
     },
     {
         "id": "isabel",
         "prompt": (
             "anime illustration of an elegant floral vanity room interior, "
-            "ornate mirror with gold frame, flower vases with roses and lilies, "
-            "jewelry box with necklaces and earrings, perfume bottles, "
-            "makeup brushes and cosmetics, lace curtains, soft pink lighting, "
-            "dried flower bouquets, ribbon and hairpins, vintage decor, "
-            "detailed anime background art style, no people, no characters"
+            "ornate gold mirror on wall, flower vases with roses and lilies, "
+            "open jewelry box with necklaces and earrings, perfume bottles, "
+            "makeup brushes and cosmetics on table, lace curtains, soft pink lighting, "
+            "dried flower bouquets, ribbon and hairpins, vintage chair, "
+            "small framed photos, candle holder, porcelain figurines, "
+            "detailed anime background art style, romantic atmosphere, no people"
         ),
     },
 ]

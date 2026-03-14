@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 """
-Generate diff images by using base images as reference via online img2img API.
-The API will produce a similar but subtly different version of each scene.
+Generate vintage detective noir style portrait cards for each character
+using the online img2img API with character avatars as reference images.
 
 Usage:
-  ~/miniconda3/bin/python3 generate_diffs_online.py          # all 6
-  ~/miniconda3/bin/python3 generate_diffs_online.py --only 1  # level 1 only
-
-After generation, use find_diffs.py to detect actual difference regions
-and update coordinates in levels/index.ts.
+  ~/miniconda3/bin/python3 generate_cards.py          # all 7
+  ~/miniconda3/bin/python3 generate_cards.py --only 1  # card 1 only
 """
 
 import argparse
@@ -40,80 +37,85 @@ R2_SECRET_KEY = "e7926e4175b7a0914496b9c999afd914cd1e4af7db8f83e0cf2bfad9773fa2b
 R2_BUCKET = "aigram"
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-IMG_DIR = os.path.join(SCRIPT_DIR, "src", "SpotDiff", "img", "levels")
+CHARS_DIR = os.path.join(SCRIPT_DIR, "src", "SpotDiff", "img", "chars")
+CARDS_DIR = os.path.join(SCRIPT_DIR, "src", "SpotDiff", "img", "cards")
+POSTER_PATH = os.path.join(SCRIPT_DIR, "src", "SpotDiff", "img", "poster_new.png")
 
-# Each scene: use same theme prompt but ask for small variations
-SCENES = [
+TARGET_SIZE = (512, 512)
+
+CARDS = [
     {
         "id": "algram",
+        "ref": os.path.join(CHARS_DIR, "algram.png"),
+        "out": os.path.join(CARDS_DIR, "algram.png"),
         "prompt": (
-            "anime illustration of a cozy music studio room interior, "
-            "BLUE electric guitar leaning on wall instead of sunburst guitar, "
-            "vinyl turntable with ORANGE vinyl record instead of black record, "
-            "RED headphones on floor instead of black headphones, "
-            "guitar amplifier, guitar pedals, warm lighting, wooden floor, cables, "
-            "posters on wall, detailed anime background art style, no people"
+            "vintage sepia detective noir portrait, young man with spiky hair "
+            "holding guitar, side profile, moody lighting, old paper texture, "
+            "muted brown tones, magnifying glass motif, retro illustration style"
         ),
     },
     {
         "id": "jenny",
+        "ref": os.path.join(CHARS_DIR, "jenny.png"),
+        "out": os.path.join(CARDS_DIR, "jenny.png"),
         "prompt": (
-            "anime illustration of a programmer desk workspace interior, "
-            "WHITE cat sleeping on desk corner instead of no cat, "
-            "small CACTUS plant on desk instead of leafy potted plant, "
-            "BRIGHT RED desk lamp instead of yellow desk lamp, "
-            "dual monitors, keyboard, sticky notes, books, "
-            "cozy night atmosphere, detailed anime background art style, no people"
+            "vintage sepia detective noir portrait, young woman with glasses "
+            "and brown hair wearing hoodie, side profile, moody lighting, "
+            "old paper texture, muted brown tones, magnifying glass motif, "
+            "retro illustration style"
         ),
     },
     {
         "id": "jmf",
+        "ref": os.path.join(CHARS_DIR, "jmf.png"),
+        "out": os.path.join(CARDS_DIR, "jmf.png"),
         "prompt": (
-            "anime illustration of a dark hacker room interior, "
-            "BRIGHT PINK neon sign on ceiling instead of blue neon sign, "
-            "extra PIZZA BOX on desk that was not there before, "
-            "RED tangled cables on floor instead of blue cables, "
-            "multiple monitors, server rack, dim ambient light, cyberpunk, "
-            "detailed anime background art style, no people"
+            "vintage sepia detective noir portrait, mature man with glasses "
+            "and black hair wearing dark jacket, side profile, moody lighting, "
+            "old paper texture, muted brown tones, magnifying glass motif, "
+            "retro illustration style"
         ),
     },
     {
         "id": "ghostpixel",
+        "ref": os.path.join(CHARS_DIR, "ghostpixel.png"),
+        "out": os.path.join(CARDS_DIR, "ghostpixel.png"),
         "prompt": (
-            "anime illustration of a spooky haunted mansion study room interior, "
-            "old wooden desk with glowing RED crystal ball instead of blue crystal ball, "
-            "GREEN candles in silver candelabra instead of blue candles, "
-            "mysterious RED and ORANGE portal on wall instead of purple portal, "
-            "dusty bookshelves with ancient tomes, WHITE OWL perching on skull instead of raven, "
-            "cobwebs in corners, cracked window with moonlight, ornate dark rug, "
-            "ghostly mist floating near floor, old globe on stand, "
-            "detailed anime background art style, gothic atmosphere, no people"
+            "vintage sepia detective noir portrait, mysterious ghost figure "
+            "with white sheet, side profile, moody lighting, old paper texture, "
+            "muted brown tones, magnifying glass motif, retro illustration style"
         ),
     },
     {
         "id": "isaya",
+        "ref": os.path.join(CHARS_DIR, "isaya.png"),
+        "out": os.path.join(CARDS_DIR, "isaya.png"),
         "prompt": (
-            "anime illustration of an artist bedroom studio interior, "
-            "wooden easel with half-finished LANDSCAPE MOUNTAIN painting instead of abstract, "
-            "ORANGE tabby cat sitting on windowsill instead of black cat, scattered art supplies, "
-            "stacked sketchbooks, PINK fairy lights on wall instead of warm yellow, "
-            "RED headphones on desk instead of no headphones, cozy bed with plushies, "
-            "paint palette with bright colors, jar of paintbrushes, warm sunset light, "
-            "SUNFLOWER in pot on shelf instead of small plant, vinyl record player, coffee cup, "
-            "detailed anime background art style, warm cozy atmosphere, no people"
+            "vintage sepia detective noir portrait, young woman with long blue "
+            "hair wearing headphones and dark hoodie, side profile, moody "
+            "lighting, old paper texture, muted brown tones, magnifying glass "
+            "motif, retro illustration style"
         ),
     },
     {
         "id": "isabel",
+        "ref": os.path.join(CHARS_DIR, "isabel.png"),
+        "out": os.path.join(CARDS_DIR, "isabel.png"),
         "prompt": (
-            "anime illustration of an elegant floral vanity room interior, "
-            "ornate SILVER mirror on wall instead of gold mirror, "
-            "flower vases with YELLOW SUNFLOWERS instead of roses and lilies, "
-            "open jewelry box with PEARL NECKLACE draped on mirror, BLUE perfume bottles, "
-            "makeup brushes and cosmetics on table, GREEN lace curtains instead of white, "
-            "dried LAVENDER bouquets instead of flower bouquets, soft PURPLE lighting, "
-            "ribbon and hairpins, vintage chair, small framed photos, candle holder, "
-            "detailed anime background art style, romantic atmosphere, no people"
+            "vintage sepia detective noir portrait, elegant woman with silver "
+            "hair, side profile, moody lighting, old paper texture, muted "
+            "brown tones, magnifying glass motif, retro illustration style"
+        ),
+    },
+    {
+        "id": "poster",
+        "ref": os.path.join(CHARS_DIR, "algram.png"),
+        "out": POSTER_PATH,
+        "prompt": (
+            "vintage detective novel cover illustration, large magnifying glass "
+            "in center revealing hidden clues, six character silhouettes around "
+            "the edges, sepia brown tones, old paper texture, text SPOT THE "
+            "DIFFERENCE at top, retro mystery book cover style"
         ),
     },
 ]
@@ -124,14 +126,12 @@ def _sign(key, msg):
 
 
 def upload_to_r2(path):
-    """Upload image to Cloudflare R2 → public CDN URL."""
+    """Upload image to Cloudflare R2 -> public CDN URL."""
     print(f"  ↑ Uploading {os.path.basename(path)} to R2…")
     with open(path, "rb") as f:
         data = f.read()
 
-    # Add timestamp to key to bust CDN cache
-    ts = int(time.time())
-    obj_key = f"refs/spot-diff/{os.path.basename(os.path.dirname(path))}_{ts}_{os.path.basename(path)}"
+    obj_key = "refs/spot-diff/cards_" + os.path.basename(path)
     host = f"{R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
     now = datetime.datetime.now(datetime.UTC)
     amz_date = now.strftime("%Y%m%dT%H%M%SZ")
@@ -263,37 +263,58 @@ def download_image(url, out_path):
     print(f"  ✓ Saved → {out_path}  ({size_kb} KB)")
 
 
-def resize_to_match(diff_path, base_path):
-    """Resize diff image to match base image dimensions exactly."""
+def resize_to_square(path, size=TARGET_SIZE):
+    """Resize image to exact square dimensions."""
     from PIL import Image
-    base = Image.open(base_path)
-    diff = Image.open(diff_path)
-    if diff.size != base.size:
-        print(f"  ✂ Resizing diff {diff.size} → {base.size}")
-        diff = diff.resize(base.size, Image.LANCZOS)
-        diff.save(diff_path, "PNG", optimize=True)
+    img = Image.open(path)
+    if img.size != size:
+        print(f"  ✂ Resizing {img.size} → {size}")
+        img = img.resize(size, Image.LANCZOS)
+        img.save(path, "PNG", optimize=True)
 
 
-def generate_diff(scene):
-    base_path = os.path.join(IMG_DIR, scene["id"], "base.png")
-    diff_path = os.path.join(IMG_DIR, scene["id"], "diff.png")
+def prepare_square_ref(ref_path):
+    """Create a temporary square version of the ref image for upload."""
+    from PIL import Image
+    img = Image.open(ref_path)
+    if img.size == TARGET_SIZE:
+        return ref_path  # already square and correct size
 
-    if not os.path.exists(base_path):
-        print(f"\n  ⏭ Skipping {scene['id']} — no base.png")
+    # Create temp square version
+    tmp_path = ref_path + ".square_tmp.png"
+    img = img.resize(TARGET_SIZE, Image.LANCZOS)
+    img.save(tmp_path, "PNG", optimize=True)
+    print(f"  ✂ Prepared square ref {img.size} → {TARGET_SIZE}")
+    return tmp_path
+
+
+def generate_card(card):
+    ref_path = card["ref"]
+    out_path = card["out"]
+
+    if not os.path.exists(ref_path):
+        print(f"\n  ⏭ Skipping {card['id']} — no ref image at {ref_path}")
         return False
 
     print(f"\n{'='*60}")
-    print(f"Generating diff for: {scene['id']}")
-    print(f"  Using base.png as reference image")
+    print(f"Generating card for: {card['id']}")
+    print(f"  Ref: {ref_path}")
+    print(f"  Out: {out_path}")
     print(f"{'='*60}")
 
-    # Upload base image as reference
-    ref_url = upload_to_r2(base_path)
+    # Resize ref to square before uploading (API output matches input aspect ratio)
+    square_ref = prepare_square_ref(ref_path)
+    try:
+        ref_url = upload_to_r2(square_ref)
+    finally:
+        # Clean up temp file if we created one
+        if square_ref != ref_path and os.path.exists(square_ref):
+            os.remove(square_ref)
 
-    # Call API with base as ref
+    # Call API with ref
     while True:
         try:
-            result_url = call_api(ref_url, scene["prompt"])
+            result_url = call_api(ref_url, card["prompt"])
         except RuntimeError as e:
             if str(e) == "rate_limit":
                 print(f"  ⏳ Rate limited — waiting {RATE_LIMIT_S}s…")
@@ -303,44 +324,49 @@ def generate_diff(scene):
         break
 
     if not result_url:
-        print(f"  ✗ Failed to generate diff for {scene['id']}")
+        print(f"  ✗ Failed to generate card for {card['id']}")
         return False
 
-    download_image(result_url, diff_path)
+    download_image(result_url, out_path)
 
-    # Ensure same dimensions as base
+    # Resize output to 512x512
     try:
-        resize_to_match(diff_path, base_path)
+        resize_to_square(out_path)
     except ImportError:
-        print("  ⚠ PIL not available, skipping resize check")
+        print("  ⚠ PIL not available, skipping resize")
 
     return True
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate diff images via img2img API")
-    parser.add_argument("--only", type=int, help="Generate only level N (1-6)")
+    parser = argparse.ArgumentParser(description="Generate detective noir portrait cards via img2img API")
+    parser.add_argument("--only", type=int, help="Generate only card N (1-7)")
     args = parser.parse_args()
 
-    scenes = SCENES
+    cards = CARDS
     if args.only:
         idx = args.only - 1
-        if idx < 0 or idx >= len(SCENES):
-            sys.exit(f"ERROR: --only must be 1-{len(SCENES)}")
-        scenes = [SCENES[idx]]
+        if idx < 0 or idx >= len(CARDS):
+            sys.exit(f"ERROR: --only must be 1-{len(CARDS)}")
+        cards = [CARDS[idx]]
+
+    # Ensure output directories exist
+    os.makedirs(CARDS_DIR, exist_ok=True)
 
     success = 0
-    for i, scene in enumerate(scenes):
-        ok = generate_diff(scene)
+    for i, card in enumerate(cards):
+        ok = generate_card(card)
         if ok:
             success += 1
-        if i < len(scenes) - 1:
+        if i < len(cards) - 1:
             print(f"\n  ⏳ Waiting {RATE_LIMIT_S}s for rate limit…")
             time.sleep(RATE_LIMIT_S)
 
     print(f"\n{'='*60}")
-    print(f"Done: {success}/{len(scenes)} diff images generated")
-    print(f"\nNext: run find_diffs.py to detect difference regions")
+    print(f"Done: {success}/{len(cards)} card images generated")
+    print(f"  Cards saved to: {CARDS_DIR}")
+    if any(c["id"] == "poster" for c in cards):
+        print(f"  Poster saved to: {POSTER_PATH}")
     print(f"{'='*60}")
 
 

@@ -8,14 +8,12 @@ interface DiffMarkerProps {
 }
 
 const DiffMarker: React.FC<DiffMarkerProps> = ({ cx, cy, r, type }) => {
-  // r is normalized (0-1), but we display circle relative to container
-  // Use percentage positioning
-  const size = `${r * 200}%`; // diameter in percentage
+  // Use width only + aspect-ratio:1 in CSS for perfect circle
+  const size = `${r * 200}%`;
   const style: React.CSSProperties = {
     left: `${cx * 100}%`,
     top: `${cy * 100}%`,
     width: size,
-    height: size,
   };
 
   return (
