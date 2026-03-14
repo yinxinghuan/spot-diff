@@ -59,7 +59,7 @@ const MESSAGES: Record<string, Record<Locale, string>> = {
   'bubble.start.jmf': { zh: '……有人动过我的东西。', en: '...Someone touched my stuff.' },
   'bubble.start.ghostpixel': { zh: '这屋子有点不对劲…', en: "Something's off here..." },
   'bubble.start.isaya': { zh: '我的画室有些变化呢~', en: 'My studio looks different~' },
-  'bubble.start.isabel': { zh: '我的梳妆台被动过了！', en: 'Someone messed with my vanity!' },
+  'bubble.start.isabel': { zh: '谁动了我的洗衣房！', en: 'Someone messed with my laundry!' },
 
   // Character names
   'char.algram': { zh: 'Algram', en: 'Algram' },
