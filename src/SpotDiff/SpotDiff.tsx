@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSpotDiff } from './hooks/useSpotDiff';
-import { t } from './i18n';
+import { t, getLocale } from './i18n';
 import SplashScreen from './components/SplashScreen';
 import LevelSelect from './components/LevelSelect';
 import ImagePair from './components/ImagePair';
@@ -136,6 +136,14 @@ const SpotDiff: React.FC = () => {
               {'★'.repeat(lastResult.stars)}{'☆'.repeat(3 - lastResult.stars)}
             </div>
             <h2 className="sd__modal-title sd__modal-title--complete">{t('complete')}</h2>
+            <div className="sd__clues">
+              {currentLevel.differences.map(d => (
+                <div key={d.id} className="sd__clue">
+                  <span className="sd__clue-emoji">{d.emoji}</span>
+                  <span className="sd__clue-label">{getLocale() === 'zh' ? d.label_zh : d.label_en}</span>
+                </div>
+              ))}
+            </div>
             {isNewRecord && <div className="sd__new-record">{t('newRecord')}</div>}
             <div className="sd__result">
               <div className="sd__result-row">

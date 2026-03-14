@@ -38,9 +38,9 @@ export const LEVELS: LevelDef[] = [
     baseImg: algramBase,
     diffImg: algramDiff,
     differences: [
-      { id: 'a1', cx: 0.174, cy: 0.643, r: 0.18, label_zh: '吉他颜色', label_en: 'Guitar color' },
-      { id: 'a2', cx: 0.697, cy: 0.369, r: 0.12, label_zh: '黑胶唱片', label_en: 'Vinyl record' },
-      { id: 'a3', cx: 0.114, cy: 0.931, r: 0.10, label_zh: '耳机颜色', label_en: 'Headphones' },
+      { id: 'a1', cx: 0.174, cy: 0.643, r: 0.18, label_zh: '吉他颜色', label_en: 'Guitar color', emoji: '🎸' },
+      { id: 'a2', cx: 0.697, cy: 0.369, r: 0.12, label_zh: '黑胶唱片', label_en: 'Vinyl record', emoji: '💿' },
+      { id: 'a3', cx: 0.114, cy: 0.931, r: 0.10, label_zh: '耳机颜色', label_en: 'Headphones', emoji: '🎧' },
     ],
   },
   {
@@ -52,9 +52,9 @@ export const LEVELS: LevelDef[] = [
     baseImg: jennyBase,
     diffImg: jennyDiff,
     differences: [
-      { id: 'j1', cx: 0.185, cy: 0.554, r: 0.16, label_zh: '台灯颜色', label_en: 'Desk lamp' },
-      { id: 'j2', cx: 0.855, cy: 0.644, r: 0.12, label_zh: '猫咪', label_en: 'Cat' },
-      { id: 'j3', cx: 0.281, cy: 0.883, r: 0.10, label_zh: '盆栽植物', label_en: 'Plant' },
+      { id: 'j1', cx: 0.185, cy: 0.554, r: 0.16, label_zh: '台灯颜色', label_en: 'Desk lamp', emoji: '💡' },
+      { id: 'j2', cx: 0.855, cy: 0.644, r: 0.12, label_zh: '猫咪', label_en: 'Cat', emoji: '🐱' },
+      { id: 'j3', cx: 0.281, cy: 0.883, r: 0.10, label_zh: '盆栽植物', label_en: 'Plant', emoji: '🌿' },
     ],
   },
   {
@@ -66,9 +66,9 @@ export const LEVELS: LevelDef[] = [
     baseImg: jmfBase,
     diffImg: jmfDiff,
     differences: [
-      { id: 'm1', cx: 0.525, cy: 0.119, r: 0.14, label_zh: '霓虹灯', label_en: 'Neon sign' },
-      { id: 'm2', cx: 0.156, cy: 0.870, r: 0.12, label_zh: '地面物品', label_en: 'Floor items' },
-      { id: 'm3', cx: 0.626, cy: 0.774, r: 0.12, label_zh: '地面线缆', label_en: 'Floor cables' },
+      { id: 'm1', cx: 0.525, cy: 0.119, r: 0.14, label_zh: '霓虹灯', label_en: 'Neon sign', emoji: '💜' },
+      { id: 'm2', cx: 0.156, cy: 0.870, r: 0.12, label_zh: '地面物品', label_en: 'Floor items', emoji: '📦' },
+      { id: 'm3', cx: 0.626, cy: 0.774, r: 0.12, label_zh: '地面线缆', label_en: 'Floor cables', emoji: '🔌' },
     ],
   },
   {
@@ -80,9 +80,9 @@ export const LEVELS: LevelDef[] = [
     baseImg: ghostpixelBase,
     diffImg: ghostpixelDiff,
     differences: [
-      { id: 'g1', cx: 0.937, cy: 0.483, r: 0.12, label_zh: '右侧机器', label_en: 'Right machine' },
-      { id: 'g2', cx: 0.948, cy: 0.272, r: 0.12, label_zh: '右上区域', label_en: 'Upper right' },
-      { id: 'g3', cx: 0.623, cy: 0.707, r: 0.12, label_zh: '地面物品', label_en: 'Floor item' },
+      { id: 'g1', cx: 0.937, cy: 0.483, r: 0.12, label_zh: '右侧机器', label_en: 'Right machine', emoji: '🕹️' },
+      { id: 'g2', cx: 0.948, cy: 0.272, r: 0.12, label_zh: '右上区域', label_en: 'Upper right', emoji: '👾' },
+      { id: 'g3', cx: 0.623, cy: 0.707, r: 0.12, label_zh: '地面物品', label_en: 'Floor item', emoji: '🎮' },
     ],
   },
   {
@@ -94,9 +94,9 @@ export const LEVELS: LevelDef[] = [
     baseImg: isayaBase,
     diffImg: isayaDiff,
     differences: [
-      { id: 'i1', cx: 0.244, cy: 0.479, r: 0.12, label_zh: '桌面区域', label_en: 'Desk area' },
-      { id: 'i2', cx: 0.363, cy: 0.713, r: 0.10, label_zh: '地面物品', label_en: 'Floor item' },
-      { id: 'i3', cx: 0.542, cy: 0.657, r: 0.10, label_zh: '床边物品', label_en: 'Bed area' },
+      { id: 'i1', cx: 0.244, cy: 0.479, r: 0.12, label_zh: '桌面区域', label_en: 'Desk area', emoji: '🖥️' },
+      { id: 'i2', cx: 0.363, cy: 0.713, r: 0.10, label_zh: '地面物品', label_en: 'Floor item', emoji: '📀' },
+      { id: 'i3', cx: 0.542, cy: 0.657, r: 0.10, label_zh: '床边物品', label_en: 'Bed area', emoji: '🛏️' },
     ],
   },
   {
@@ -108,9 +108,9 @@ export const LEVELS: LevelDef[] = [
     baseImg: isabelBase,
     diffImg: isabelDiff,
     differences: [
-      { id: 'b1', cx: 0.681, cy: 0.630, r: 0.10, label_zh: '水槽区域', label_en: 'Sink area' },
-      { id: 'b2', cx: 0.403, cy: 0.119, r: 0.10, label_zh: '架子物品', label_en: 'Shelf items' },
-      { id: 'b3', cx: 0.498, cy: 0.497, r: 0.10, label_zh: '洗衣机上', label_en: 'Washer top' },
+      { id: 'b1', cx: 0.681, cy: 0.630, r: 0.10, label_zh: '水槽区域', label_en: 'Sink area', emoji: '🚰' },
+      { id: 'b2', cx: 0.403, cy: 0.119, r: 0.10, label_zh: '架子物品', label_en: 'Shelf items', emoji: '🧴' },
+      { id: 'b3', cx: 0.498, cy: 0.497, r: 0.10, label_zh: '洗衣机上', label_en: 'Washer top', emoji: '👕' },
     ],
   },
 ];
