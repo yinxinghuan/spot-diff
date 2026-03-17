@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { LEVELS } from '../levels';
 import posterImg from '../img/poster.png';
 
-const ALL_IMAGES: string[] = LEVELS.flatMap(l => [l.baseImg, l.diffImg]);
+const ALL_IMAGES: string[] = LEVELS.flatMap(l => [l.baseImg, l.diffImg, l.avatar, l.cardImg]);
 const MIN_MS = 2200;
 const MAX_ASSET_MS = 10000;
 
