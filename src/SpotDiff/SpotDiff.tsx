@@ -67,10 +67,6 @@ const SpotDiff: React.FC = () => {
       )}
       {/* Watermark */}
       <img className="sd__watermark" src={aigramLogo} alt="" draggable={false} />
-      {phase === 'idle' && (
-        <button className="sd__lb-icon" onPointerDown={() => setShowLeaderboard(true)}>🏆</button>
-      )}
-
       {/* === IDLE / Title Screen === */}
       {phase === 'idle' && (
         <div className="sd__title">
@@ -93,6 +89,7 @@ const SpotDiff: React.FC = () => {
             <button className="sd__btn sd__btn--start" onPointerDown={() => { resumeAudio(); playClick(); goToSelect(); }}>
               {t('startBtn')}
             </button>
+            <button className="sd__lb-icon" onPointerDown={() => setShowLeaderboard(true)}>🏆</button>
           </div>
           <img className="sd__title-watermark" src={aigramLogo} alt="" draggable={false} />
         </div>
