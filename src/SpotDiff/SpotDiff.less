@@ -697,6 +697,24 @@
       }
     }
 
+    &--lb {
+      background: transparent;
+      border: 2px solid rgba(200, 168, 96, 0.35);
+      color: rgba(200, 168, 96, 0.7);
+      box-shadow: none;
+      font-size: 12px;
+      padding: 10px 28px 14px;
+      margin-top: 8px;
+      letter-spacing: 0.08em;
+
+      &::after { display: none; }
+
+      &:active {
+        background: rgba(200, 168, 96, 0.08);
+        transform: none;
+      }
+    }
+
     &--back {
       background: @bg-card;
       border: 3px solid @bg-dark;
