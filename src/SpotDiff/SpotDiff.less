@@ -381,6 +381,27 @@
     pointer-events: none;
   }
 
+  // Leaderboard icon
+  &__lb-icon {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 50;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.2);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    &:active { background: rgba(0, 0, 0, 0.4); transform: scale(0.9); }
+  }
+
   // Watermark
   &__watermark {
     position: absolute;
