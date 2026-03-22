@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSpotDiff } from './hooks/useSpotDiff';
 import { t, getLocale } from './i18n';
 import SplashScreen from './components/SplashScreen';
@@ -8,12 +8,15 @@ import CharBubble from './components/CharBubble';
 import HintButton from './components/HintButton';
 import aigramLogo from './img/aigram.svg';
 import { playClick, resumeAudio } from './utils/sounds';
+import { useGameScore, Leaderboard } from '@shared/leaderboard';
 import './SpotDiff.less';
 
 const POINTS_PER_FIND = 100;
 
 const SpotDiff: React.FC = () => {
   const [showSplash, setShowSplash] = useState(true);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const { isInAigram, submitScore, fetchGlobalLeaderboard, fetchFriendsLeaderboard } = useGameScore('spot-diff');
   const {
     phase,
     save,
@@ -39,12 +42,29 @@ const SpotDiff: React.FC = () => {
     nextLevel,
   } = useSpotDiff();
 
+  // 每关完成时提交累计总分
+  useEffect(() => {
+    if (phase === 'complete' || phase === 'allClear') {
+      const total = Object.values(save?.results ?? {}).reduce((sum, r) => sum + (r?.score ?? 0), 0);
+      if (total > 0) submitScore(total);
+    }
+  }, [phase]);
+
   if (showSplash) {
     return <SplashScreen onDone={() => setShowSplash(false)} />;
   }
 
   return (
     <div className="sd">
+      {showLeaderboard && (
+        <Leaderboard
+          gameName="Spot the Difference"
+          isInAigram={isInAigram}
+          onClose={() => setShowLeaderboard(false)}
+          fetchGlobal={fetchGlobalLeaderboard}
+          fetchFriends={fetchFriendsLeaderboard}
+        />
+      )}
       {/* Watermark */}
       <img className="sd__watermark" src={aigramLogo} alt="" draggable={false} />
 
@@ -69,6 +89,9 @@ const SpotDiff: React.FC = () => {
           <div className="sd__title-bottom">
             <button className="sd__btn sd__btn--start" onPointerDown={() => { resumeAudio(); playClick(); goToSelect(); }}>
               {t('startBtn')}
+            </button>
+            <button className="sd__btn sd__btn--lb" onPointerDown={() => setShowLeaderboard(true)}>
+              🏆 排行榜
             </button>
           </div>
           <img className="sd__title-watermark" src={aigramLogo} alt="" draggable={false} />
