@@ -125,7 +125,9 @@ export function useGameScore(gameId: string) {
         apiOrigin,
         `/note/telegram/user/contact/list?telegram_id=${telegramId}`
       );
-      const ids = [telegramId, ...contacts.data.map(f => f.telegram_id)].join(',');
+      // Aigram may return { data: [...] } or a direct array — handle both
+      const list: AigramUser[] = Array.isArray(contacts) ? contacts : (contacts?.data ?? []);
+      const ids = [telegramId, ...list.map(f => f.telegram_id)].join(',');
       const res = await fetch(
         `${GAMES_API}/leaderboard?game_id=${gameId}&telegram_ids=${encodeURIComponent(ids)}`
       );
