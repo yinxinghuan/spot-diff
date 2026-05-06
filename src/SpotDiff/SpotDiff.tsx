@@ -7,6 +7,7 @@ import LevelSelect from './components/LevelSelect';
 import ImagePair from './components/ImagePair';
 import CharBubble from './components/CharBubble';
 import HintButton from './components/HintButton';
+import TitlePulses from './components/TitlePulses';
 import aigramLogo from './img/aigram.svg';
 import { playClick, resumeAudio } from './utils/sounds';
 import { useGameScore, Leaderboard } from '@shared/leaderboard';
@@ -90,6 +91,7 @@ const SpotDiff: React.FC = () => {
       {/* === IDLE / Title Screen === */}
       {phase === 'idle' && (
         <div className="sd__title">
+          <TitlePulses />
           <div className="sd__title-top">
             <div className="sd__title-magnifier">🔍</div>
             <div className="sd__title-badge">CASE FILE</div>
