@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import type { SaveData } from './types';
 import { useSpotDiff } from './hooks/useSpotDiff';
 import { t, getLocale } from './i18n';
 import SplashScreen from './components/SplashScreen';
@@ -9,6 +10,7 @@ import HintButton from './components/HintButton';
 import aigramLogo from './img/aigram.svg';
 import { playClick, resumeAudio } from './utils/sounds';
 import { useGameScore, Leaderboard } from '@shared/leaderboard';
+import { useGameSave } from '@shared/save';
 import './SpotDiff.less';
 
 const POINTS_PER_FIND = 100;
@@ -17,9 +19,17 @@ const SpotDiff: React.FC = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const { isInAigram, submitScore, fetchGlobalLeaderboard, fetchFriendsLeaderboard } = useGameScore('spot-diff');
+  const { savedData, persist } = useGameSave<SaveData>('spot-diff');
+
+  // Stable cloud persist callback so useSpotDiff's deps stay quiet.
+  const persistRef = useRef(persist);
+  persistRef.current = persist;
+  const cloudPersist = useCallback((data: SaveData) => persistRef.current(data), []);
+
   const {
     phase,
     save,
+    adoptSave,
     currentLevel,
     foundIds,
     time,
@@ -40,7 +50,17 @@ const SpotDiff: React.FC = () => {
     handleTap,
     useHint,
     nextLevel,
-  } = useSpotDiff();
+  } = useSpotDiff({ persist: cloudPersist });
+
+  // Adopt cloud snapshot once it arrives (cross-device sync).
+  // Cloud is authoritative — it overwrites local state on first load.
+  const cloudAdoptedRef = useRef(false);
+  useEffect(() => {
+    if (savedData && !cloudAdoptedRef.current) {
+      cloudAdoptedRef.current = true;
+      adoptSave(savedData);
+    }
+  }, [savedData, adoptSave]);
 
   // 每关完成时提交累计总分
   useEffect(() => {

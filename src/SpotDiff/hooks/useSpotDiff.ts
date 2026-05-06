@@ -5,7 +5,21 @@ import { getLocale } from '../i18n';
 import type { BubbleMood } from '../utils/expressions';
 import { resumeAudio, playTap, playFound, playWrong, playHint, playComplete, playStart } from '../utils/sounds';
 
-const STORAGE_KEY = 'sd_save';
+const STORAGE_KEY = 'spot-diff-save';
+const LEGACY_STORAGE_KEY = 'sd_save';
+
+// One-time migration from legacy key so cloud sync (which uses STORAGE_KEY)
+// inherits existing local progress.
+(function migrateLegacySave() {
+  try {
+    const old = localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (old && !localStorage.getItem(STORAGE_KEY)) {
+      localStorage.setItem(STORAGE_KEY, old);
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+    }
+  } catch { /* private mode / quota — ignore */ }
+})();
+
 const POINTS_PER_FIND = 100;
 const TIME_BONUS_MAX = 300;
 const TIME_PENALTY_RATE = 2;
@@ -44,9 +58,16 @@ function calcStars(score: number, totalDiffs: number): number {
   return 1;
 }
 
-export function useSpotDiff() {
+export interface UseSpotDiffOptions {
+  /** Cloud persistence callback. Local writes also fire this so cloud stays in sync. */
+  persist?: (data: SaveData) => void;
+}
+
+export function useSpotDiff(options: UseSpotDiffOptions = {}) {
   const [phase, setPhase] = useState<GamePhase>('idle');
   const [save, setSave] = useState<SaveData>(loadSave);
+  const persistRef = useRef(options.persist);
+  persistRef.current = options.persist;
   const [currentLevel, setCurrentLevel] = useState<LevelDef | null>(null);
   const [foundIds, setFoundIds] = useState<Set<string>>(new Set());
   const [time, setTime] = useState(0);
@@ -146,6 +167,7 @@ export function useSpotDiff() {
     }
 
     writeSave(newSave);
+    persistRef.current?.(newSave);
     setSave(newSave);
     setIsNewRecord(isRecord);
     setPhase('complete');
@@ -237,9 +259,16 @@ export function useSpotDiff() {
 
   const isAllClear = LEVELS.every(l => save.results[l.id]);
 
+  /** Adopt cloud-loaded save (called by parent once useGameSave resolves). */
+  const adoptSave = useCallback((data: SaveData) => {
+    setSave(data);
+    writeSave(data);
+  }, []);
+
   return {
     phase,
     save,
+    adoptSave,
     currentLevel,
     foundIds,
     time,
