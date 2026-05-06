@@ -33,3 +33,14 @@ declare module '@shared/leaderboard' {
 
   export function useGameScore(gameId: string): GameScoreResult;
 }
+
+declare module '@shared/save' {
+  export interface UseGameSave<T> {
+    savedData: T | null | undefined;
+    loaded: boolean;
+    hasSave: boolean;
+    persist: (data: T) => void;
+    clear: () => Promise<void>;
+  }
+  export function useGameSave<T>(gameId: string): UseGameSave<T>;
+}
