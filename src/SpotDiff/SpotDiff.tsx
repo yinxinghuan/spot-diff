@@ -19,7 +19,7 @@ const POINTS_PER_FIND = 100;
 const SpotDiff: React.FC = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const { isInAigram, submitScore, fetchGlobalLeaderboard, fetchFriendsLeaderboard } = useGameScore('spot-diff');
+  const { isInAigram, submitScore, fetchLeaderboard } = useGameScore();
   const { savedData, persist } = useGameSave<SaveData>('spot-diff');
 
   // Stable cloud persist callback so useSpotDiff's deps stay quiet.
@@ -82,8 +82,7 @@ const SpotDiff: React.FC = () => {
           gameName="Spot the Difference"
           isInAigram={isInAigram}
           onClose={() => setShowLeaderboard(false)}
-          fetchGlobal={fetchGlobalLeaderboard}
-          fetchFriends={fetchFriendsLeaderboard}
+          fetch={fetchLeaderboard}
         />
       )}
       {/* Watermark */}
